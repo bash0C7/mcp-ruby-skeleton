@@ -33,7 +33,7 @@ module MCP
               STDOUT.puts(response)
               STDOUT.flush
             else
-              @logger.debug("No response generated for message")
+              @logger.debug("No response needed for this message (likely a notification)")
             end
           end
         rescue => e

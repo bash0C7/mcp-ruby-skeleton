@@ -43,7 +43,17 @@ module MCP
         @logger.warn("Invalid JSON-RPC version: #{parsed['jsonrpc']}")
         return error_response(parsed['id'], -32600, "Invalid Request: Expected jsonrpc 2.0")
       end
+      
+      # Check if this is a notification (no id field and method starts with "notifications/")
+      is_notification = parsed['method']&.start_with?("notifications/") && !parsed.key?('id')
 
+      # Notification処理（notifications/で始まるメソッド名）
+      if is_notification
+        @logger.info("Received notification: #{parsed['method']}")
+        return nil # 通知にはレスポンスを返さない
+      end
+
+      # 通常のリクエスト処理
       case parsed['method']
       when 'initialize'
         response = handle_initialize(parsed)
@@ -52,10 +62,6 @@ module MCP
           send_initialized_notification
         end
         return response
-      when 'initialized'
-        # Client sends this notification, we don't need to respond
-        @logger.info("Received initialized notification from client")
-        return nil
       when 'tools/list'
         handle_list_tools(parsed)
       when 'tools/call'
