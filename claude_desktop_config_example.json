@@ -1,0 +1,10 @@
+{
+  "mcpServers": {
+    "random-number": {
+      "command": "ruby",
+      "args": [
+        "/Users/bash/src/mcp-ruby-skeleton/bin/run_server.rb"
+      ]
+    }
+  }
+}
