@@ -1,6 +1,8 @@
-# MCP Random Number Server
+# MCP Ruby Server Skeleton
 
-A simple Model Context Protocol (MCP) server implementation in Ruby that provides a tool to generate random numbers.
+> Acknowledgment: This implementation was inspired by the article [Building a Model Context Protocol Server with TypeScript](https://azukiazusa.dev/blog/typescript-mcp-server/) by Azuki Azusa.
+
+This project is a Ruby implementation of a Model Context Protocol (MCP) server skeleton. It provides an interface that allows Large Language Models (LLMs) like Claude to call tools. The current implementation provides a tool that generates random numbers.
 
 ## Features
 
@@ -13,16 +15,33 @@ A simple Model Context Protocol (MCP) server implementation in Ruby that provide
 
 - Ruby 3.0+
 
-## Implementation Details
+## Architecture and Design
 
-This server implements the Model Context Protocol which allows LLMs like Claude to interact with tools and resources. The implementation includes:
+This server consists of the following components:
 
 ### Core Components
 
 - `MCP::Server`: Main server implementation that handles MCP protocol messages
+  - Protocol initialization
+  - Tool registration and management
+  - Message handling
+  - Tool listing and execution
+  - Error handling
+
 - `MCP::Transport::Stdio`: Standard I/O transport layer for communication
+  - Message reception
+  - Response transmission
+  - Event-driven message handling
+
 - `MCP::Tool`: Tool definition and execution handler
+  - Management of tool name, description, and input schema
+  - Tool logic implementation
+  - Argument processing during execution
+
 - `RandomNumberServer`: Server implementation that registers and manages tools
+  - Server initialization
+  - Tool setup
+  - Server execution
 
 ### Protocol Flow
 
@@ -33,10 +52,11 @@ The server follows the MCP initialization protocol:
 3. Server sends an `initialized` notification
 4. Client can then list and call tools
 
-### Tools API
+### Implemented MCP APIs
 
 The server implements the following MCP APIs:
 
+- `initialize`: Server initialization and protocol version negotiation
 - `tools/list`: Lists available tools and their schemas
 - `tools/call`: Executes a tool with provided arguments
 
@@ -86,8 +106,7 @@ Add the following to your Claude Desktop configuration at:
 
 Replace the path with the absolute path to your `run_server.rb` file on your system.
 
-After configuring, restart Claude Desktop and ask it to generate a random number, such as:
-"Generate a random number between 1 and 50."
+After configuring, restart Claude Desktop and try a prompt like "Generate a random number between 1 and 50."
 
 ## Debugging
 
@@ -106,6 +125,8 @@ tail -f ~/Library/Logs/Claude/mcp*.log
 # On Windows
 type "%APPDATA%\Claude\logs\mcp*.log"
 ```
+
+The server itself logs to standard error output (STDERR), and the log level is set during the initialization of the `RandomNumberServer` class (currently at DEBUG level).
 
 ### Common Issues
 
@@ -171,6 +192,22 @@ def setup_tools
 end
 ```
 
-## License
+### Testing
 
-MIT
+When implementing new tools or server features, it's recommended to add tests. Testing should combine unit tests, integration tests, and end-to-end tests.
+
+Tests should verify:
+- Proper definition and registration of tools
+- Correct protocol handling
+- Error handling
+- Input validation
+- Expected output confirmation
+
+### Error Handling and Exceptions
+
+To improve the robustness of the MCP server, it's important to implement proper error handling and exception handling:
+
+1. Appropriately catch exceptions during tool execution and return meaningful error messages to clients
+2. Validate invalid input parameters
+3. Properly handle network and I/O errors
+4. Consider timeouts and resource limitations
